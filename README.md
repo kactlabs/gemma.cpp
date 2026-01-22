@@ -78,8 +78,43 @@ Guidelines](https://opensource.google.com/conduct/).
 -   Frontends
 
     -   C++ APIs with streaming for single query and batched inference.
-    -   Basic interactive command-line app.
+    -   Multiple CLI tools: `gemma-cli` (simple CLI), `gemma-server` (HTTP server), `gemma` (interactive terminal).
+    -   HTTP API servers with Google API compatibility.
     -   Basic Python bindings (pybind11).
+
+## CLI Tools
+
+gemma.cpp provides multiple command-line tools similar to llama.cpp:
+
+| Tool | Description | Use Case |
+|------|-------------|----------|
+| **gemma-cli** | Simple CLI for single prompts | Scripting, automation, quick tests |
+| **gemma-server** | HTTP server with REST API | Web apps, API integration |
+| **gemma** | Interactive terminal interface | Exploration, development, chat |
+| **gemma_api_server** | Google API compatible server | Google API compatibility |
+| **gemma_api_client** | API client for testing | Testing servers |
+
+**Quick Examples:**
+
+```bash
+# Simple CLI
+./build/gemma-cli --weights model.sbs --prompt "Hello!"
+
+# HTTP Server
+./build/gemma-server --weights model.sbs --port 8080
+curl -X POST http://localhost:8080/completion \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "Hello!"}'
+
+# Interactive
+./build/gemma --weights model.sbs --tokenizer tokenizer.spm
+```
+
+**Documentation:**
+- [CLI_README.md](CLI_README.md) - Detailed CLI documentation
+- [QUICKSTART_CLI.md](QUICKSTART_CLI.md) - Quick start guide
+- [TOOLS_COMPARISON.md](TOOLS_COMPARISON.md) - Tool comparison
+- [CLI_TOOLS_SUMMARY.md](CLI_TOOLS_SUMMARY.md) - Summary and status
 
 ## Quick Start
 

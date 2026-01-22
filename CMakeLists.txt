@@ -261,7 +261,17 @@ add_executable(migrate_weights io/migrate_weights.cc)
 target_link_libraries(migrate_weights libgemma hwy hwy_contrib)
 
 
-# API server with SSE support
+# CLI tool (similar to llama-cli)
+add_executable(gemma-cli gemma/cli.cc)
+target_link_libraries(gemma-cli libgemma hwy hwy_contrib)
+install(TARGETS gemma-cli DESTINATION bin)
+
+# Server tool (similar to llama-server)
+add_executable(gemma-server gemma/server.cc)
+target_link_libraries(gemma-server libgemma hwy hwy_contrib nlohmann_json::nlohmann_json httplib_interface)
+install(TARGETS gemma-server DESTINATION bin)
+
+# API server with SSE support (Google API compatible)
 add_executable(gemma_api_server gemma/api_server.cc)
 target_link_libraries(gemma_api_server libgemma hwy hwy_contrib nlohmann_json::nlohmann_json httplib_interface)
 

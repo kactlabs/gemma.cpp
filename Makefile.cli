@@ -1,0 +1,97 @@
+# Convenience Makefile for gemma.cpp CLI tools
+# Usage: make -f Makefile.cli [target]
+
+.PHONY: all cli server interactive api-server api-client clean help test-cli test-server
+
+# Default target
+all: cli server interactive api-server api-client
+
+# Configure and build
+configure:
+	cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+
+# Build individual tools
+cli: configure
+	cmake --build build --target gemma-cli -j8
+
+server: configure
+	cmake --build build --target gemma-server -j8
+
+interactive: configure
+	cmake --build build --target gemma -j8
+
+api-server: configure
+	cmake --build build --target gemma_api_server -j8
+
+api-client: configure
+	cmake --build build --target gemma_api_client -j8
+
+migrate: configure
+	cmake --build build --target migrate_weights -j8
+
+# Build all CLI tools
+build-all: configure
+	cmake --build build -j8
+
+# Clean build directory
+clean:
+	rm -rf build/*
+
+# Test CLI (requires MODEL and TOKENIZER environment variables)
+test-cli:
+	@if [ -z "$(MODEL)" ]; then \
+		echo "Error: MODEL environment variable not set"; \
+		echo "Usage: make -f Makefile.cli test-cli MODEL=path/to/model.sbs TOKENIZER=path/to/tokenizer.spm"; \
+		exit 1; \
+	fi
+	./build/gemma-cli --weights $(MODEL) --tokenizer $(TOKENIZER) --prompt "What is 2+2?"
+
+# Test server (requires MODEL and TOKENIZER environment variables)
+test-server:
+	@if [ -z "$(MODEL)" ]; then \
+		echo "Error: MODEL environment variable not set"; \
+		echo "Usage: make -f Makefile.cli test-server MODEL=path/to/model.sbs TOKENIZER=path/to/tokenizer.spm"; \
+		exit 1; \
+	fi
+	@echo "Starting server on port 8080..."
+	@echo "Press Ctrl+C to stop"
+	./build/gemma-server --weights $(MODEL) --tokenizer $(TOKENIZER) --port 8080
+
+# Run interactive mode (requires MODEL and TOKENIZER environment variables)
+run-interactive:
+	@if [ -z "$(MODEL)" ]; then \
+		echo "Error: MODEL environment variable not set"; \
+		echo "Usage: make -f Makefile.cli run-interactive MODEL=path/to/model.sbs TOKENIZER=path/to/tokenizer.spm"; \
+		exit 1; \
+	fi
+	./build/gemma --weights $(MODEL) --tokenizer $(TOKENIZER)
+
+# Show help
+help:
+	@echo "Gemma.cpp CLI Tools - Makefile"
+	@echo ""
+	@echo "Targets:"
+	@echo "  all              - Build all CLI tools (default)"
+	@echo "  cli              - Build gemma-cli only"
+	@echo "  server           - Build gemma-server only"
+	@echo "  interactive      - Build gemma (interactive) only"
+	@echo "  api-server       - Build gemma_api_server only"
+	@echo "  api-client       - Build gemma_api_client only"
+	@echo "  migrate          - Build migrate_weights only"
+	@echo "  build-all        - Build everything"
+	@echo "  clean            - Clean build directory"
+	@echo "  test-cli         - Test gemma-cli (requires MODEL and TOKENIZER)"
+	@echo "  test-server      - Test gemma-server (requires MODEL and TOKENIZER)"
+	@echo "  run-interactive  - Run interactive mode (requires MODEL and TOKENIZER)"
+	@echo "  help             - Show this help message"
+	@echo ""
+	@echo "Examples:"
+	@echo "  make -f Makefile.cli all"
+	@echo "  make -f Makefile.cli cli"
+	@echo "  make -f Makefile.cli test-cli MODEL=model.sbs TOKENIZER=tokenizer.spm"
+	@echo "  make -f Makefile.cli test-server MODEL=model.sbs TOKENIZER=tokenizer.spm"
+	@echo ""
+	@echo "For more information, see:"
+	@echo "  - CLI_README.md"
+	@echo "  - QUICKSTART_CLI.md"
+	@echo "  - CLI_TOOLS_SUMMARY.md"
